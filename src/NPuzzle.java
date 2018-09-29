@@ -350,7 +350,7 @@ public class NPuzzle {
             NPuzzleState goalState, Queue<TreeNode<NPuzzleState>> frontier) {
     	// Add
     	// length -> pair<number of expanded nodes h1,number of expanded nodes h2>
-    	TreeMap<Integer,Pair<ArrayList<Integer>,ArrayList<Integer>>> experiment = new TreeMap<>();
+    	TreeMap<Integer,Pair<ArrayList<Integer>,ArrayList<Integer>>> collection = new TreeMap<>();
     	
         for (int i = 0; i < 1000; i++){
             NPuzzleState initState = new NPuzzleState(8);  // random
@@ -377,42 +377,42 @@ public class NPuzzle {
             // list of actions to reach goal state, number of expanded nodes (h2) 
 			Pair<ArrayList<Action>, Integer> solutionH2 = solve(initState, goalState, frontierH2, true, 500000);
 			
-			if(experiment.isEmpty())
+			if(collection.isEmpty())
 			{
 				numNodeEx1.add(solutionH1.r);
 				pairTemp = new Pair<ArrayList<Integer>,ArrayList<Integer>>(numNodeEx1, new ArrayList<Integer>());
-				experiment.put(solutionH1.l.size(), pairTemp);
+				collection.put(solutionH1.l.size(), pairTemp);
 			}
 			else
 			{
 				// add h1 in TreeMap
-				if(!experiment.containsKey(solutionH1.l.size()))
+				if(!collection.containsKey(solutionH1.l.size()))
 				{
 					numNodeEx1.add(solutionH1.r);
 					pairTemp = new Pair<ArrayList<Integer>,ArrayList<Integer>>(numNodeEx1, new ArrayList<Integer>());
-					experiment.put(solutionH1.l.size(), pairTemp);
+					collection.put(solutionH1.l.size(), pairTemp);
 				}
 				else
 				{
-					experiment.get(solutionH1.l.size()).l.add(solutionH1.r);
+					collection.get(solutionH1.l.size()).l.add(solutionH1.r);
 				}
 			}
 			
 			// add h2 in TreeMap
-			if(!experiment.containsKey(solutionH2.l.size()))
+			if(!collection.containsKey(solutionH2.l.size()))
 			{
 				numNodeEx2.add(solutionH2.r);
 				pairTemp = new Pair<ArrayList<Integer>,ArrayList<Integer>>(new ArrayList<Integer>(), numNodeEx2);
-				experiment.put(solutionH2.l.size(), pairTemp);
+				collection.put(solutionH2.l.size(), pairTemp);
 			}
 			else
 			{
-				experiment.get(solutionH2.l.size()).r.add(solutionH2.r);
+				collection.get(solutionH2.l.size()).r.add(solutionH2.r);
 			}
         }
         
         // display (length,step_h1,step_h2,num_h1,num_h2)
-        for(Entry<Integer, Pair<ArrayList<Integer>,ArrayList<Integer>>> entry : experiment.entrySet()) 
+        for(Entry<Integer, Pair<ArrayList<Integer>,ArrayList<Integer>>> entry : collection.entrySet()) 
         {
             double sum1 = 0.00;
             double avg1 = 0.00;
@@ -481,8 +481,8 @@ public class NPuzzle {
          //Queue<TreeNode<NPuzzleState>> frontier = new PriorityQueue<>(new HeuristicComparator(goalState, 2, true));
         
         //int[][] easy = {{0, 1, 2},{3, 4, 5},{6, 7, 8}};
-//        int[][] easy = {{1, 4, 2},{3, 0, 5},{6, 7, 8}};
-//        NPuzzleState initState = new NPuzzleState(easy);
+        //int[][] easy = {{1, 4, 2},{3, 0, 5},{6, 7, 8}};
+        //NPuzzleState initState = new NPuzzleState(easy);
 
          //int[][] hard = {{7, 2, 4}, {5, 0, 6}, {8, 3, 1}};
          //NPuzzleState initState = new NPuzzleState(hard);
