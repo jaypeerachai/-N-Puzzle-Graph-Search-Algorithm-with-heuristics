@@ -49,7 +49,6 @@ public class NPuzzle {
     }
 
     public static boolean isSolvable(NPuzzleState initState, NPuzzleState goalState) {
-    	//System.out.println(parity(initState) + " " + parity(goalState));
         return parity(initState) == parity(goalState);
     }
 
@@ -72,6 +71,7 @@ public class NPuzzle {
         int[][] newBoard = state.copyBoard();
         Boolean isInvalid = false;
         NPuzzleState newState = null;
+        // UP
         if(action.compareTo(Action.UP) == 0)
         {
         	if( r > 0 )
@@ -86,6 +86,7 @@ public class NPuzzle {
         		isInvalid = true;
         	}
         }
+        // DOWN
         else if(action.compareTo(Action.DOWN) == 0)
         {
         	if( r < (s-1) )
@@ -100,6 +101,7 @@ public class NPuzzle {
         		isInvalid = true;
         	}
         }
+        // LEFT
         else if(action.compareTo(Action.LEFT) == 0)
         {
         	if( c > 0 )
@@ -114,6 +116,7 @@ public class NPuzzle {
         		isInvalid = true;
         	}
         }
+        // RIGHT
         else if(action.compareTo(Action.RIGHT) == 0)
         {
         	if( c < (s-1) )
@@ -128,7 +131,6 @@ public class NPuzzle {
         		isInvalid = true;
         	}
         }
-        //System.out.println(newState.toString()+"\n");
         // [end:2]
         if(isInvalid == true)
         {
@@ -203,6 +205,7 @@ public class NPuzzle {
 		{
 			TreeNode<NPuzzleState> node = frontier.remove();
 			numSteps++;
+			// check current node whether is goal state or not
 			if(isGoal(node.getState(),goalState))
 			{
 				while(node.getParent()!=null) 
@@ -304,6 +307,7 @@ public class NPuzzle {
             				{
             					if(temp == goalBoard[k][l])
             					{
+            						// find distance to goal 
             						h += Math.abs(i-k) + Math.abs(j-l);
             						continue here;
             					}
@@ -345,6 +349,7 @@ public class NPuzzle {
     public static void experiment(
             NPuzzleState goalState, Queue<TreeNode<NPuzzleState>> frontier) {
     	// Add
+    	// length -> pair<number of expanded nodes h1,number of expanded nodes h2>
     	TreeMap<Integer,Pair<ArrayList<Integer>,ArrayList<Integer>>> experiment = new TreeMap<>();
     	
         for (int i = 0; i < 1000; i++){
@@ -358,14 +363,18 @@ public class NPuzzle {
             
             if( i == 0)
             {
-            	System.out.printf("\n%12s%12s%12s%12s%12s\n","length,","step_h1,","step_h2,","num_h1,","num_h2");
+            	System.out.printf("\n%13s%13s%13s%13s%13s\n","length,","step_h1,","step_h2,","num_h1,","num_h2");
             }
             Pair<ArrayList<Integer>,ArrayList<Integer>> pairTemp = null;
             ArrayList<Integer> numNodeEx1 = new ArrayList<Integer>();
             ArrayList<Integer> numNodeEx2 = new ArrayList<Integer>();
+            // frontier h1
 			Queue<TreeNode<NPuzzleState>> frontierH1 = new PriorityQueue<>( new HeuristicComparator(goalState, 1, true));
+            // frontier h2
 			Queue<TreeNode<NPuzzleState>> frontierH2 = new PriorityQueue<>( new HeuristicComparator(goalState, 2, true));
+            // list of actions to reach goal state, number of expanded nodes (h1) 
 			Pair<ArrayList<Action>, Integer> solutionH1 = solve(initState, goalState, frontierH1, true, 500000);
+            // list of actions to reach goal state, number of expanded nodes (h2) 
 			Pair<ArrayList<Action>, Integer> solutionH2 = solve(initState, goalState, frontierH2, true, 500000);
 			
 			if(experiment.isEmpty())
@@ -376,6 +385,7 @@ public class NPuzzle {
 			}
 			else
 			{
+				// add h1 in TreeMap
 				if(!experiment.containsKey(solutionH1.l.size()))
 				{
 					numNodeEx1.add(solutionH1.r);
@@ -388,6 +398,7 @@ public class NPuzzle {
 				}
 			}
 			
+			// add h2 in TreeMap
 			if(!experiment.containsKey(solutionH2.l.size()))
 			{
 				numNodeEx2.add(solutionH2.r);
@@ -400,6 +411,7 @@ public class NPuzzle {
 			}
         }
         
+        // display (length,step_h1,step_h2,num_h1,num_h2)
         for(Entry<Integer, Pair<ArrayList<Integer>,ArrayList<Integer>>> entry : experiment.entrySet()) 
         {
             double sum1 = 0.00;
@@ -421,6 +433,7 @@ public class NPuzzle {
 				avg2 = sum2/entry.getValue().r.size();
 				System.out.printf("\n%12d,%12.2f,%12.2f,%12d,%12d",key,avg1,avg2,entry.getValue().l.size(),entry.getValue().r.size());
 			}
+			// length's row that has no h2
 			else if (!entry.getValue().l.isEmpty())
 			{
 				for(int i = 0 ; i < entry.getValue().l.size() ; i++)
@@ -430,6 +443,7 @@ public class NPuzzle {
 				avg1 = sum1/entry.getValue().l.size();
 				System.out.printf("\n%12d,%12.2f,%12.2f,%12d,%12d",key,avg1,0.00,entry.getValue().l.size(),0);
 			}
+			// length's row that has no h1
 			else if (!entry.getValue().r.isEmpty())
 			{
 				for(int i = 0 ; i < entry.getValue().r.size() ; i++)
